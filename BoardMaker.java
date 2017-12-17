@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 public class BoardMaker extends JPanel implements ActionListener{
 	private boolean playing = false;
-	private boolean before = true; 
+	private static boolean before = true; 
 	static JFrame screen = new JFrame();
 	private final int BOARD_LENGTH = 300;
 	private final int BOARD_WIDTH = 300;
@@ -20,13 +20,17 @@ public class BoardMaker extends JPanel implements ActionListener{
 	private static int blob_x;
 	private static int blob_y;
 	private static int dots;
+	
 	private boolean leftDirection = false;
 	private boolean rightDirection = true;
 	private boolean upDirection = false;
 	private boolean downDirection = false;
+	
 	private final int x[] = new int[ALL_DOTS];
 	private final int y[] = new int[ALL_DOTS];
+	
 	JButton button = new JButton("Start");
+	static JButton resButton = new JButton("Play Again?");
 	private Timer timer;
 	private final int DELAY = 75; 
 
@@ -39,36 +43,40 @@ public class BoardMaker extends JPanel implements ActionListener{
 		setFocusable(true);
 		button.setLayout(null);
 		this.add(button);
+		this.add(resButton);
 		button.addActionListener(this);
 		button.setVisible(true);
-
+		resButton.setLayout(null);
+		resButton.addActionListener(this);
+		resButton.setVisible(false);
 	}
 	public static void gameOver(Graphics g) {
+		before = true;
 		if (dots< 5) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("How terrible", 40, 200);
 		}
 		else if (dots < 10) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("Meh... You're still pretty bad", 40, 200);
 		}
 		else if (dots< 25) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("You're OK", 40, 200);
 		}
 		else if (dots < 50) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("You're Average.", 40, 200);
 		}
 		else if (dots < 100) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("You're Pretty Good!", 40, 200);
 		}
 		else if (dots >= 100) {
-			g.drawString("You got " + dots + " points", 40, 40);
+			g.drawString("You got " + dots + " points", 40, 100);
 			g.drawString("WOW! You're are the greatest Snake player ever!", 40, 200);
 		}
-
+		resButton.setVisible(true);
 
 
 
@@ -79,15 +87,36 @@ public class BoardMaker extends JPanel implements ActionListener{
 	private void drawSnake(Graphics g) {
 
 		if (playing) {
+			g.setColor(Color.black);
+			g.drawRect(0, 0, 300, 300);
 			//draw the blob
 			g.setColor(Color.blue);
 			g.fillRect(blob_x, blob_y, 10,10);
-
+			//draw the snake
 			for (int z = 0; z < dots; z++) {
-				g.setColor(Color.red);
+				g.setColor(Color.black);
+				g.drawRect( x[z], y[z],10,10);
+				if (dots<10) {
+					g.setColor(Color.red);
+				}
+				else if (dots<20) {
+					g.setColor(Color.green);
+				}
+				else if (dots<30) {
+					g.setColor(Color.cyan);
+				}
+				else if (dots<40) {
+					g.setColor(Color.orange);
+				}
+				else if (dots<50) {
+					g.setColor(Color.black);
+				}
+				else if (dots >= 50) {
+					g.setColor(Color.yellow);
+				}
 				g.fillRect( x[z], y[z],10,10);
 			}
-
+			g.drawString("Length: " + dots, 10, 280);
 			Toolkit.getDefaultToolkit().sync();
 
 		} else if (before == false) {
@@ -198,6 +227,16 @@ public class BoardMaker extends JPanel implements ActionListener{
 			playing = true;
 			before = false;
 		}
+		if (e.getSource() == resButton) {
+			startGame();
+			resButton.setVisible(false);
+			playing = true;
+			before = false;
+			upDirection = false;
+			leftDirection = false;
+			downDirection = false;
+			rightDirection = true;
+		}
 		else if (playing == true) {
 
 			checkBlob();
@@ -219,6 +258,19 @@ public class BoardMaker extends JPanel implements ActionListener{
 				leftDirection = true;
 				upDirection = false;
 				downDirection = false;
+			
+			}
+			if ((key == KeyEvent.VK_D) && (!leftDirection)) {
+				
+				upDirection = false;
+				downDirection = false;
+				rightDirection = true;
+			}
+			if ((key == KeyEvent.VK_W) && (!downDirection)) {
+				leftDirection = false;
+				upDirection = true;
+			
+				rightDirection = false;
 			}
 
 			if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
@@ -226,13 +278,25 @@ public class BoardMaker extends JPanel implements ActionListener{
 				upDirection = false;
 				downDirection = false;
 			}
+			if ((key == KeyEvent.VK_A) && (!rightDirection)) {
+				leftDirection = true;
+				upDirection = false;
+				downDirection = false;
+				
+			}
 
 			if ((key == KeyEvent.VK_UP) && (!downDirection)) {
 				upDirection = true;
 				rightDirection = false;
 				leftDirection = false;
+				
 			}
-
+			if ((key == KeyEvent.VK_S) && (!upDirection)) {
+				leftDirection = false;
+				
+				downDirection = true;
+				rightDirection = false;
+			}
 			if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
 				downDirection = true;
 				rightDirection = false;
